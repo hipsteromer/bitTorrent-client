@@ -4,14 +4,14 @@
 #include <string.h>
 #include <stdbool.h>
 
-// A type for the type of data that DecodedValue can hold
+// Enum for the type of data that DecodedValue can hold
 typedef enum DecodedValueType {
     DECODED_VALUE_TYPE_STR,   // Represents a string
     DECODED_VALUE_TYPE_INT,   // Represents an integer
     DECODED_VALUE_TYPE_LIST,  // Represents a list (array)
 } DecodedValueType;
 
-// A structure to hold either a string, integer, or list based on the specified type
+// Structure to hold either a string, integer, or list based on the specified type
 typedef struct DecodedValue {
     DecodedValueType type;
     union {
@@ -22,39 +22,45 @@ typedef struct DecodedValue {
     size_t list_length;  // Number of elements in the list (if type is DECODED_VALUE_TYPE_LIST)
 } DecodedValue;
 
+// Check if a character is a digit
 bool is_digit(char c) {
     return c >= '0' && c <= '9';
 }
 
+// Find the length of the bencoded value
 size_t find_value_length(const char *bencoded_string) {
     if (bencoded_string[0] == 'i') {
+        // Integer value
         char *ptr = strchr(bencoded_string, 'e');
         if (ptr != NULL) {
-            int index = (int)(ptr - bencoded_string);
-            return index + 1;
+            return (ptr - bencoded_string) + 1;
         }
     } else if (is_digit(bencoded_string[0])) {
+        // String value
         const char *colon = strchr(bencoded_string, ':');
         if (colon != NULL) {
             int length = atoi(bencoded_string);
             return (colon - bencoded_string + 1) + length;
         }
     } else if (bencoded_string[0] == 'l' || bencoded_string[0] == 'd') {
-        size_t length = 1;  // account for 'l' or 'd'
+        // List or dictionary value
+        size_t length = 1;
         size_t i = 1;
         while (bencoded_string[i] != 'e') {
             size_t value_length = find_value_length(&bencoded_string[i]);
-            if (value_length == 0) return 0;  // invalid format
+            if (value_length == 0) return 0;
             i += value_length;
             length += value_length;
         }
-        return length + 1;  // account for 'e'
+        return length + 1;
     }
     return 0;
 }
 
+// Decode a bencoded value
 DecodedValue decode_bencode(const char *bencoded_value);
 
+// Free the memory allocated for a decoded value
 void free_decoded_value(DecodedValue decoded) {
     if (decoded.type == DECODED_VALUE_TYPE_STR) {
         free(decoded.val.str);
@@ -66,14 +72,13 @@ void free_decoded_value(DecodedValue decoded) {
     }
 }
 
+// Decode a bencoded string
 DecodedValue decode_string(const char *bencoded_value) {
     DecodedValue decoded = {};
-
     if (is_digit(bencoded_value[0])) {
         decoded.type = DECODED_VALUE_TYPE_STR;
         int length = atoi(bencoded_value);
         const char *colon_index = strchr(bencoded_value, ':');
-
         if (colon_index != NULL) {
             const char *start = colon_index + 1;
             decoded.val.str = (char *)malloc(length + 1);
@@ -87,14 +92,13 @@ DecodedValue decode_string(const char *bencoded_value) {
         fprintf(stderr, "Invalid string format: %s\n", bencoded_value);
         exit(1);
     }
-
     return decoded;
 }
 
+// Decode a bencoded integer
 DecodedValue decode_integer(const char *bencoded_value) {
     DecodedValue decoded = {};
     size_t value_length = find_value_length(bencoded_value);
-
     if (value_length != 0) {
         decoded.type = DECODED_VALUE_TYPE_INT;
         const char *int_start = bencoded_value + 1; // Skip 'i'
@@ -106,28 +110,24 @@ DecodedValue decode_integer(const char *bencoded_value) {
         fprintf(stderr, "Invalid integer format: %s\n", bencoded_value);
         exit(1);
     }
-
     return decoded;
 }
 
+// Decode a bencoded list
 DecodedValue decode_list(const char *bencoded_value) {
     DecodedValue decoded = {};
-
     if (bencoded_value[0] == 'l') {
         decoded.type = DECODED_VALUE_TYPE_LIST;
         decoded.val.list = NULL;
         decoded.list_length = 0;
-
         size_t index = 1; // Skip 'l'
-        while (bencoded_value[index] != 'e') { // Exclude 'l' and 'e'
+        while (bencoded_value[index] != 'e') {
             const char *element_start = &bencoded_value[index];
             DecodedValue element = decode_bencode(element_start);
             size_t element_length = find_value_length(element_start);
-
             // Append the decoded element to the list
             decoded.val.list = (DecodedValue *)realloc(decoded.val.list, (decoded.list_length + 1) * sizeof(DecodedValue));
             decoded.val.list[decoded.list_length++] = element;
-
             // Move index past the decoded element
             index += element_length;
         }
@@ -135,28 +135,24 @@ DecodedValue decode_list(const char *bencoded_value) {
         fprintf(stderr, "Invalid list format: %s\n", bencoded_value);
         exit(1);
     }
-
     return decoded;
 }
 
+// Decode a bencoded value (string, integer, or list)
 DecodedValue decode_bencode(const char *bencoded_value) {
-    DecodedValue decoded = {};
-    size_t value_length = strlen(bencoded_value);
-
     if (is_digit(bencoded_value[0])) {
-        decoded = decode_string(bencoded_value);
+        return decode_string(bencoded_value);
     } else if (bencoded_value[0] == 'i') {
-        decoded = decode_integer(bencoded_value);
+        return decode_integer(bencoded_value);
     } else if (bencoded_value[0] == 'l') {
-        decoded = decode_list(bencoded_value);
+        return decode_list(bencoded_value);
     } else {
         fprintf(stderr, "Unsupported encoded value: %s\n", bencoded_value);
         exit(1);
     }
-
-    return decoded;
 }
 
+// Print the decoded value
 void print_decoded_value(DecodedValue decoded) {
     switch (decoded.type) {
         case DECODED_VALUE_TYPE_STR:
@@ -181,6 +177,7 @@ void print_decoded_value(DecodedValue decoded) {
     }
 }
 
+// Main function to decode bencoded string passed as command line argument
 int main(int argc, char *argv[]) {
     if (argc < 3) {
         fprintf(stderr, "Usage: bittorrent <command> <args>\n");
