@@ -9,9 +9,10 @@
 
 // Enum for the type of data that DecodedValue can hold
 typedef enum DecodedValueType {
-    DECODED_VALUE_TYPE_STR,   // Represents a string
-    DECODED_VALUE_TYPE_INT,   // Represents an integer
-    DECODED_VALUE_TYPE_LIST,  // Represents a list (array)
+    DECODED_VALUE_TYPE_STR,   // Represents a String
+    DECODED_VALUE_TYPE_INT,   // Represents an Integer
+    DECODED_VALUE_TYPE_LIST,  // Represents a List (array)
+    DECODED_VALUE_TYPE_DICT,  // Represents a Dictionary
 } DecodedValueType;
 
 // Structure to hold either a string, integer, or list based on the specified type
@@ -20,10 +21,21 @@ typedef struct DecodedValue {
     union {
         char *str;
         int64_t integer;
-        struct DecodedValue *list;
+        struct {
+            struct DecodedValue *list;
+        };
+        struct {
+            struct KeyValPair *dict;
+        };
     } val;
-    size_t list_length;  // Number of elements in the list (if type is DECODED_VALUE_TYPE_LIST)
+    size_t size;  // Number of elements in the list or dict
 } DecodedValue;
+
+// Structure to implement a type of key and value pair (for the dictionary)
+typedef struct KeyValPair { 
+    struct DecodedValue key;
+    struct DecodedValue val;
+} KeyValPair;
 
 // Check if a character is a digit
 bool is_digit(char c);

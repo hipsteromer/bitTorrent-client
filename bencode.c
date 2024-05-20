@@ -22,15 +22,13 @@ size_t find_value_length(const char *bencoded_string) {
         }
     } else if (bencoded_string[0] == 'l' || bencoded_string[0] == 'd') {
         // List or dictionary value
-        size_t length = 1;
         size_t i = 1;
         while (bencoded_string[i] != 'e') {
             size_t value_length = find_value_length(&bencoded_string[i]);
             if (value_length == 0) return 0;
             i += value_length;
-            length += value_length;
         }
-        return length + 1;
+        return i + 1;
     }
     return 0;
 }
@@ -82,20 +80,54 @@ DecodedValue decode_list(const char *bencoded_value) {
     if (bencoded_value[0] == 'l') {
         decoded.type = DECODED_VALUE_TYPE_LIST;
         decoded.val.list = NULL;
-        decoded.list_length = 0;
+        decoded.size = 0;
         size_t index = 1; // Skip 'l'
         while (bencoded_value[index] != 'e') {
             const char *element_start = &bencoded_value[index];
             DecodedValue element = decode_bencode(element_start);
             size_t element_length = find_value_length(element_start);
+
             // Append the decoded element to the list
-            decoded.val.list = (DecodedValue *)realloc(decoded.val.list, (decoded.list_length + 1) * sizeof(DecodedValue));
-            decoded.val.list[decoded.list_length++] = element;
+            decoded.val.list = (DecodedValue *)realloc(decoded.val.list, (decoded.size + 1) * sizeof(DecodedValue));
+            decoded.val.list[decoded.size++] = element;
+
             // Move index past the decoded element
             index += element_length;
         }
     } else {
         fprintf(stderr, "Invalid list format: %s\n", bencoded_value);
+        exit(1);
+    }
+    return decoded;
+}
+
+// Decode a bencoded dictionary
+DecodedValue decode_dict(const char *bencoded_value) {
+    DecodedValue decoded = {};
+    if (bencoded_value[0] == 'd'){
+        decoded.type = DECODED_VALUE_TYPE_DICT;
+        decoded.val.dict = NULL;
+        decoded.size = 0;
+        size_t index = 1; // Skip 'd'
+        while (bencoded_value[index] != 'e') {
+            // Decode the key
+            DecodedValue key = decode_bencode(&bencoded_value[index]);
+            size_t key_length = find_value_length(&bencoded_value[index]);
+            index += key_length;
+
+            // Decode the value
+            DecodedValue value = decode_bencode(&bencoded_value[index]);
+            size_t value_length = find_value_length(&bencoded_value[index]);
+            index += value_length;
+
+            // Append the key-value pair to the dictionary
+            decoded.val.dict = (KeyValPair *)realloc(decoded.val.dict, (decoded.size + 1) * sizeof(KeyValPair));
+            decoded.val.dict[decoded.size].key = key;
+            decoded.val.dict[decoded.size].val = value;
+            decoded.size++;
+        }
+    } else {
+        fprintf(stderr, "Invalid dictionary format: %s\n", bencoded_value);
         exit(1);
     }
     return decoded;
@@ -109,6 +141,8 @@ DecodedValue decode_bencode(const char *bencoded_value) {
         return decode_integer(bencoded_value);
     } else if (bencoded_value[0] == 'l') {
         return decode_list(bencoded_value);
+    } else if (bencoded_value[0] == 'd') {
+        return decode_dict(bencoded_value);
     } else {
         fprintf(stderr, "Unsupported encoded value: %s\n", bencoded_value);
         exit(1);
@@ -120,10 +154,16 @@ void free_decoded_value(DecodedValue decoded) {
     if (decoded.type == DECODED_VALUE_TYPE_STR) {
         free(decoded.val.str);
     } else if (decoded.type == DECODED_VALUE_TYPE_LIST) {
-        for (size_t i = 0; i < decoded.list_length; i++) {
+        for (size_t i = 0; i < decoded.size; i++) {
             free_decoded_value(decoded.val.list[i]);
         }
         free(decoded.val.list);
+    } else if (decoded.type == DECODED_VALUE_TYPE_DICT) {
+        for (size_t i = 0; i < decoded.size; i++) {
+            free_decoded_value(decoded.val.dict[i].key);
+            free_decoded_value(decoded.val.dict[i].val);
+        }
+        free(decoded.val.dict);
     }
 }
 
@@ -138,13 +178,25 @@ void print_decoded_value(DecodedValue decoded) {
             break;
         case DECODED_VALUE_TYPE_LIST:
             printf("[");
-            for (size_t i = 0; i < decoded.list_length; i++) {
+            for (size_t i = 0; i < decoded.size; i++) {
                 print_decoded_value(decoded.val.list[i]);
-                if (i < decoded.list_length - 1) {
+                if (i < decoded.size - 1) {
                     printf(", ");
                 }
             }
             printf("]");
+            break;
+        case DECODED_VALUE_TYPE_DICT:
+            printf("{");
+            for (size_t i = 0; i < decoded.size; i++) {
+                print_decoded_value(decoded.val.dict[i].key);
+                printf(": ");
+                print_decoded_value(decoded.val.dict[i].val);
+                if (i < decoded.size - 1) {
+                    printf(", ");
+                }
+            }
+            printf("}");
             break;
         default:
             fprintf(stderr, "Unknown decoded value type\n");
