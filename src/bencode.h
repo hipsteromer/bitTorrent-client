@@ -52,4 +52,4 @@ void free_decoded_value(DecodedValue decoded);
 // Print the decoded value
 void print_decoded_value(DecodedValue decoded);
 
-#endif /* BENCODE_H */
+#endif // BENCODE_H 

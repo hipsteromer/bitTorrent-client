@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
 
     const char *command = argv[1];
     const char *encoded_str = argv[2];
-
+    
     if (strcmp(command, "decode") == 0) {
         DecodedValue decoded = decode_bencode(encoded_str);
         print_decoded_value(decoded);

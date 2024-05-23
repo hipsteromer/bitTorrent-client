@@ -3,7 +3,4 @@ bagrut project
 
 
 TODO 
-1) MAKE DECODED DICT
-2) UPDATE FREE MEMORY DICT
-3) UPDATE PRINT FUNCTION
-4) UPDATE DECODE FUNCTION
+1) make torrent parsing function (info.c)
