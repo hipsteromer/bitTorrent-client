@@ -1,4 +1,8 @@
 #include "bencode.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
 
 // Check if a character is a digit
 bool is_digit(char c) {
@@ -43,6 +47,10 @@ DecodedValue decode_string(const char *bencoded_value) {
         if (colon_index != NULL) {
             const char *start = colon_index + 1;
             decoded.val.str = (char *)malloc(length + 1);
+            if (decoded.val.str == NULL) {
+                fprintf(stderr, "Memory allocation failed\n");
+                exit(1);
+            }
             strncpy(decoded.val.str, start, length);
             decoded.val.str[length] = '\0';
         } else {
@@ -65,6 +73,10 @@ DecodedValue decode_integer(const char *bencoded_value) {
         const char *int_start = bencoded_value + 1; // Skip 'i'
         size_t int_length = value_length - 2; // Exclude 'i' and 'e'
         char *int_str = strndup(int_start, int_length);
+        if (int_str == NULL) {
+            fprintf(stderr, "Memory allocation failed\n");
+            exit(1);
+        }
         decoded.val.integer = atoll(int_str);
         free(int_str);
     } else {
@@ -89,6 +101,10 @@ DecodedValue decode_list(const char *bencoded_value) {
 
             // Append the decoded element to the list
             decoded.val.list = (DecodedValue *)realloc(decoded.val.list, (decoded.size + 1) * sizeof(DecodedValue));
+            if (decoded.val.list == NULL) {
+                fprintf(stderr, "Memory reallocation failed\n");
+                exit(1);
+            }
             decoded.val.list[decoded.size++] = element;
 
             // Move index past the decoded element
@@ -104,16 +120,21 @@ DecodedValue decode_list(const char *bencoded_value) {
 // Decode a bencoded dictionary
 DecodedValue decode_dict(const char *bencoded_value) {
     DecodedValue decoded = {};
-    if (bencoded_value[0] == 'd'){
+    if (bencoded_value[0] == 'd') {
         decoded.type = DECODED_VALUE_TYPE_DICT;
         decoded.val.dict = NULL;
         decoded.size = 0;
         size_t index = 1; // Skip 'd'
+        
         while (bencoded_value[index] != 'e') {
             // Decode the key
-            DecodedValue key = decode_bencode(&bencoded_value[index]);
-            size_t key_length = find_value_length(&bencoded_value[index]);
-            index += key_length;
+            DecodedValue key_obj = decode_bencode(&bencoded_value[index]);
+            if (key_obj.type != DECODED_VALUE_TYPE_STR) {
+                fprintf(stderr, "Dictionary key is not a string: %s\n", bencoded_value);
+                exit(1);
+            }
+            size_t key_length = strlen(key_obj.val.str); // Only the key length
+            index += find_value_length(&bencoded_value[index]);
 
             // Decode the value
             DecodedValue value = decode_bencode(&bencoded_value[index]);
@@ -122,7 +143,15 @@ DecodedValue decode_dict(const char *bencoded_value) {
 
             // Append the key-value pair to the dictionary
             decoded.val.dict = (KeyValPair *)realloc(decoded.val.dict, (decoded.size + 1) * sizeof(KeyValPair));
-            decoded.val.dict[decoded.size].key = key;
+            if (decoded.val.dict == NULL) {
+                fprintf(stderr, "Memory reallocation failed\n");
+                exit(1);
+            }
+            decoded.val.dict[decoded.size].key = strdup(key_obj.val.str);
+            if (decoded.val.dict[decoded.size].key == NULL) {
+                fprintf(stderr, "Memory allocation failed\n");
+                exit(1);
+            }
             decoded.val.dict[decoded.size].val = value;
             decoded.size++;
         }
@@ -133,7 +162,7 @@ DecodedValue decode_dict(const char *bencoded_value) {
     return decoded;
 }
 
-// Decode a bencoded value (string, integer, or list)
+// Decode a bencoded value (string, integer, list, or dictionary)
 DecodedValue decode_bencode(const char *bencoded_value) {
     if (is_digit(bencoded_value[0])) {
         return decode_string(bencoded_value);
@@ -160,7 +189,7 @@ void free_decoded_value(DecodedValue decoded) {
         free(decoded.val.list);
     } else if (decoded.type == DECODED_VALUE_TYPE_DICT) {
         for (size_t i = 0; i < decoded.size; i++) {
-            free_decoded_value(decoded.val.dict[i].key);
+            free(decoded.val.dict[i].key);
             free_decoded_value(decoded.val.dict[i].val);
         }
         free(decoded.val.dict);
@@ -189,8 +218,7 @@ void print_decoded_value(DecodedValue decoded) {
         case DECODED_VALUE_TYPE_DICT:
             printf("{");
             for (size_t i = 0; i < decoded.size; i++) {
-                print_decoded_value(decoded.val.dict[i].key);
-                printf(": ");
+                printf("\"%s\": ", decoded.val.dict[i].key);
                 print_decoded_value(decoded.val.dict[i].val);
                 if (i < decoded.size - 1) {
                     printf(", ");

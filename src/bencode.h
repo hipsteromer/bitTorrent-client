@@ -33,7 +33,7 @@ typedef struct DecodedValue {
 
 // Structure to implement a type of key and value pair (for the dictionary)
 typedef struct KeyValPair { 
-    struct DecodedValue key;
+    char *key;
     struct DecodedValue val;
 } KeyValPair;
 
