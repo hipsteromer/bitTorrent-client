@@ -1,5 +1,5 @@
-#ifndef BENCODE_H
-#define BENCODE_H
+#ifndef DECODE_H
+#define DECODE_H
 
 #include <stdio.h>
 #include <stdint.h>
@@ -52,4 +52,4 @@ void free_decoded_value(DecodedValue decoded);
 // Print the decoded value
 void print_decoded_value(DecodedValue decoded);
 
-#endif // BENCODE_H 
+#endif // DECODE_H 

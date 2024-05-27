@@ -1,7 +1,7 @@
 #ifndef INFO_H
 #define INFO_H
 
-#include "bencode.h"
+#include "decode.h"
 
 // Struct that holds the info essentials
 typedef struct MetaInfo {
