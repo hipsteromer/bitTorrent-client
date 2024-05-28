@@ -10,6 +10,7 @@ typedef struct MetaInfo {
     char *name;
     size_t piece_length;
     char *pieces;
+    char* info_hash;
 } MetaInfo;
 
 // A function that reads and puts file contents in a string

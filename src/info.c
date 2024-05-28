@@ -1,4 +1,6 @@
 #include "info.h"
+#include "bencode.h"
+#include "sha1/sha1.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -99,13 +101,33 @@ MetaInfo info_extract(const char *content) {
         exit(1);
     }
 
+    // Assign info hash
+    char *bencoded_info = encode_decode(decoded_content.val.dict[info_index].val);
+    unsigned char hash[SHA1_DIGEST_LENGTH];
+    if (!sha1_hash((const unsigned char *)bencoded_info, strlen(bencoded_info), hash)) {
+        fprintf(stderr, "SHA-1 hash computation failed");
+        exit(1);
+    }
+    printf(bencoded_info);
+    free(bencoded_info);
+    printf("%s", hash);
+    file_contents.info_hash = (char *)malloc(SHA1_DIGEST_LENGTH);
+    if(file_contents.info_hash == NULL) {
+        fprintf(stderr, "memory allocation failed");
+        exit(1);
+    }
+    strcpy(file_contents.info_hash, hash);
+
     return file_contents;
 }
+
+
 
 void free_info(MetaInfo info) {
     free(info.url);
     free(info.name);
     free(info.pieces);
+    free(info.info_hash);
 }
 
 
@@ -114,4 +136,7 @@ void print_meta_info(MetaInfo info) {
         printf("Tracker URL: %s\n", info.url);
     }
     printf("Length: %zu\n", info.length);
+    if(info.info_hash != NULL) {
+        printf("info hash: %s\n", info.info_hash);
+    }
 }

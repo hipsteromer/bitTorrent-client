@@ -4,6 +4,6 @@ bagrut project
 
 <<<<<<< HEAD
 TODO 
-1) make torrent parsing function (info.c)
+1) fix hashing and encoding problems. not printing (possibly not allocating memory)
 =======
 >>>>>>> origin/main
