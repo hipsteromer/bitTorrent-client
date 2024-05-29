@@ -1,4 +1,4 @@
-# Install script for directory: /Users/omersahar/Desktop/project1/omer/bitTorrent-client/src
+# Install script for directory: /Users/omersahar/Desktop/project1/omer/bitTorrent-client
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/omersahar/Desktop/project1/omer/bitTorrent-client/src/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/omersahar/Desktop/project1/omer/bitTorrent-client/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

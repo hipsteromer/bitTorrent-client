@@ -1,4 +1,4 @@
-CMakeFiles/bittorrent.dir/decode.c.o: \
+CMakeFiles/bittorrent.dir/src/decode.c.o: \
   /Users/omersahar/Desktop/project1/omer/bitTorrent-client/src/decode.c \
   /Users/omersahar/Desktop/project1/omer/bitTorrent-client/src/decode.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/stdio.h \

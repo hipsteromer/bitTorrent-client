@@ -57,10 +57,10 @@ RM = /opt/homebrew/Cellar/cmake/3.29.3/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/omersahar/Desktop/project1/omer/bitTorrent-client/src
+CMAKE_SOURCE_DIR = /Users/omersahar/Desktop/project1/omer/bitTorrent-client
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/omersahar/Desktop/project1/omer/bitTorrent-client/src/build
+CMAKE_BINARY_DIR = /Users/omersahar/Desktop/project1/omer/bitTorrent-client/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/omersahar/Desktop/project1/omer/bitTorrent-client/src/build/CMakeFiles /Users/omersahar/Desktop/project1/omer/bitTorrent-client/src/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/omersahar/Desktop/project1/omer/bitTorrent-client/build/CMakeFiles /Users/omersahar/Desktop/project1/omer/bitTorrent-client/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/omersahar/Desktop/project1/omer/bitTorrent-client/src/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/omersahar/Desktop/project1/omer/bitTorrent-client/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -129,125 +129,125 @@ bittorrent/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/build
 .PHONY : bittorrent/fast
 
-bencode.o: bencode.c.o
-.PHONY : bencode.o
+src/bencode.o: src/bencode.c.o
+.PHONY : src/bencode.o
 
 # target to build an object file
-bencode.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/bencode.c.o
-.PHONY : bencode.c.o
+src/bencode.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/src/bencode.c.o
+.PHONY : src/bencode.c.o
 
-bencode.i: bencode.c.i
-.PHONY : bencode.i
+src/bencode.i: src/bencode.c.i
+.PHONY : src/bencode.i
 
 # target to preprocess a source file
-bencode.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/bencode.c.i
-.PHONY : bencode.c.i
+src/bencode.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/src/bencode.c.i
+.PHONY : src/bencode.c.i
 
-bencode.s: bencode.c.s
-.PHONY : bencode.s
+src/bencode.s: src/bencode.c.s
+.PHONY : src/bencode.s
 
 # target to generate assembly for a file
-bencode.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/bencode.c.s
-.PHONY : bencode.c.s
+src/bencode.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/src/bencode.c.s
+.PHONY : src/bencode.c.s
 
-decode.o: decode.c.o
-.PHONY : decode.o
+src/decode.o: src/decode.c.o
+.PHONY : src/decode.o
 
 # target to build an object file
-decode.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/decode.c.o
-.PHONY : decode.c.o
+src/decode.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/src/decode.c.o
+.PHONY : src/decode.c.o
 
-decode.i: decode.c.i
-.PHONY : decode.i
+src/decode.i: src/decode.c.i
+.PHONY : src/decode.i
 
 # target to preprocess a source file
-decode.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/decode.c.i
-.PHONY : decode.c.i
+src/decode.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/src/decode.c.i
+.PHONY : src/decode.c.i
 
-decode.s: decode.c.s
-.PHONY : decode.s
+src/decode.s: src/decode.c.s
+.PHONY : src/decode.s
 
 # target to generate assembly for a file
-decode.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/decode.c.s
-.PHONY : decode.c.s
+src/decode.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/src/decode.c.s
+.PHONY : src/decode.c.s
 
-info.o: info.c.o
-.PHONY : info.o
+src/info.o: src/info.c.o
+.PHONY : src/info.o
 
 # target to build an object file
-info.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/info.c.o
-.PHONY : info.c.o
+src/info.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/src/info.c.o
+.PHONY : src/info.c.o
 
-info.i: info.c.i
-.PHONY : info.i
+src/info.i: src/info.c.i
+.PHONY : src/info.i
 
 # target to preprocess a source file
-info.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/info.c.i
-.PHONY : info.c.i
+src/info.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/src/info.c.i
+.PHONY : src/info.c.i
 
-info.s: info.c.s
-.PHONY : info.s
+src/info.s: src/info.c.s
+.PHONY : src/info.s
 
 # target to generate assembly for a file
-info.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/info.c.s
-.PHONY : info.c.s
+src/info.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/src/info.c.s
+.PHONY : src/info.c.s
 
-main.o: main.c.o
-.PHONY : main.o
+src/main.o: src/main.c.o
+.PHONY : src/main.o
 
 # target to build an object file
-main.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/main.c.o
-.PHONY : main.c.o
+src/main.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/src/main.c.o
+.PHONY : src/main.c.o
 
-main.i: main.c.i
-.PHONY : main.i
+src/main.i: src/main.c.i
+.PHONY : src/main.i
 
 # target to preprocess a source file
-main.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/main.c.i
-.PHONY : main.c.i
+src/main.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/src/main.c.i
+.PHONY : src/main.c.i
 
-main.s: main.c.s
-.PHONY : main.s
+src/main.s: src/main.c.s
+.PHONY : src/main.s
 
 # target to generate assembly for a file
-main.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/main.c.s
-.PHONY : main.c.s
+src/main.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/src/main.c.s
+.PHONY : src/main.c.s
 
-sha1/sha1.o: sha1/sha1.c.o
-.PHONY : sha1/sha1.o
+src/sha1/sha1.o: src/sha1/sha1.c.o
+.PHONY : src/sha1/sha1.o
 
 # target to build an object file
-sha1/sha1.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/sha1/sha1.c.o
-.PHONY : sha1/sha1.c.o
+src/sha1/sha1.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/src/sha1/sha1.c.o
+.PHONY : src/sha1/sha1.c.o
 
-sha1/sha1.i: sha1/sha1.c.i
-.PHONY : sha1/sha1.i
+src/sha1/sha1.i: src/sha1/sha1.c.i
+.PHONY : src/sha1/sha1.i
 
 # target to preprocess a source file
-sha1/sha1.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/sha1/sha1.c.i
-.PHONY : sha1/sha1.c.i
+src/sha1/sha1.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/src/sha1/sha1.c.i
+.PHONY : src/sha1/sha1.c.i
 
-sha1/sha1.s: sha1/sha1.c.s
-.PHONY : sha1/sha1.s
+src/sha1/sha1.s: src/sha1/sha1.c.s
+.PHONY : src/sha1/sha1.s
 
 # target to generate assembly for a file
-sha1/sha1.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/sha1/sha1.c.s
-.PHONY : sha1/sha1.c.s
+src/sha1/sha1.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bittorrent.dir/build.make CMakeFiles/bittorrent.dir/src/sha1/sha1.c.s
+.PHONY : src/sha1/sha1.c.s
 
 # Help Target
 help:
@@ -258,21 +258,21 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... bittorrent"
-	@echo "... bencode.o"
-	@echo "... bencode.i"
-	@echo "... bencode.s"
-	@echo "... decode.o"
-	@echo "... decode.i"
-	@echo "... decode.s"
-	@echo "... info.o"
-	@echo "... info.i"
-	@echo "... info.s"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
-	@echo "... sha1/sha1.o"
-	@echo "... sha1/sha1.i"
-	@echo "... sha1/sha1.s"
+	@echo "... src/bencode.o"
+	@echo "... src/bencode.i"
+	@echo "... src/bencode.s"
+	@echo "... src/decode.o"
+	@echo "... src/decode.i"
+	@echo "... src/decode.s"
+	@echo "... src/info.o"
+	@echo "... src/info.i"
+	@echo "... src/info.s"
+	@echo "... src/main.o"
+	@echo "... src/main.i"
+	@echo "... src/main.s"
+	@echo "... src/sha1/sha1.o"
+	@echo "... src/sha1/sha1.i"
+	@echo "... src/sha1/sha1.s"
 .PHONY : help
 
 

@@ -1,6 +1,6 @@
-CMakeFiles/bittorrent.dir/bencode.c.o: \
-  /Users/omersahar/Desktop/project1/omer/bitTorrent-client/src/bencode.c \
-  /Users/omersahar/Desktop/project1/omer/bitTorrent-client/src/bencode.h \
+CMakeFiles/bittorrent.dir/src/main.c.o: \
+  /Users/omersahar/Desktop/project1/omer/bitTorrent-client/src/main.c \
+  /Users/omersahar/Desktop/project1/omer/bitTorrent-client/src/info.h \
   /Users/omersahar/Desktop/project1/omer/bitTorrent-client/src/decode.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/stdio.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/_stdio.h \
@@ -86,6 +86,4 @@ CMakeFiles/bittorrent.dir/bencode.c.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/strings.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/secure/_strings.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/secure/_string.h \
-  /Library/Developer/CommandLineTools/usr/lib/clang/15.0.0/include/stdbool.h \
-  /Library/Developer/CommandLineTools/usr/lib/clang/15.0.0/include/inttypes.h \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/inttypes.h
+  /Library/Developer/CommandLineTools/usr/lib/clang/15.0.0/include/stdbool.h

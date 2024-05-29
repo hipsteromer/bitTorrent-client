@@ -1,4 +1,4 @@
-CMakeFiles/bittorrent.dir/sha1/sha1.c.o: \
+CMakeFiles/bittorrent.dir/src/sha1/sha1.c.o: \
   /Users/omersahar/Desktop/project1/omer/bitTorrent-client/src/sha1/sha1.c \
   /Users/omersahar/Desktop/project1/omer/bitTorrent-client/src/sha1/sha1.h \
   /opt/homebrew/include/openssl/evp.h \

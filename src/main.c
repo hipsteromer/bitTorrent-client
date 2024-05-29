@@ -5,6 +5,7 @@
 #include <string.h>
 
 int main(int argc, char *argv[]) {
+    printf("compiled");
     if (argc < 3) {
         fprintf(stderr, "Usage: bittorrent <command> <args>\n");
         return 1;

@@ -1,4 +1,4 @@
-CMakeFiles/bittorrent.dir/info.c.o: \
+CMakeFiles/bittorrent.dir/src/info.c.o: \
   /Users/omersahar/Desktop/project1/omer/bitTorrent-client/src/info.c \
   /Users/omersahar/Desktop/project1/omer/bitTorrent-client/src/info.h \
   /Users/omersahar/Desktop/project1/omer/bitTorrent-client/src/decode.h \

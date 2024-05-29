@@ -2,7 +2,7 @@
 
 char *bencode_string(char *decoded) {
     if (decoded == NULL) return NULL;
-    
+    printf("encoding string: ");
     size_t len = strlen(decoded);
     size_t encoded_len = snprintf(NULL, 0, "%zu", len) + len + 1;
     char *encoded_str = (char *)malloc(encoded_len);
@@ -13,11 +13,14 @@ char *bencode_string(char *decoded) {
     }
     
     sprintf(encoded_str, "%zu:%s", len, decoded);
+    printf("%s\n", encoded_str);
     return encoded_str;
 }
 
 // Function to encode an integer
 char *bencode_integer(int64_t decoded) {
+    printf("encoding integer: ");
+
     size_t encoded_len = snprintf(NULL, 0, "%" PRId64, decoded) + 2;
     char *encoded_str = (char *)malloc(encoded_len);
     
@@ -27,13 +30,15 @@ char *bencode_integer(int64_t decoded) {
     }
     
     sprintf(encoded_str, "i%" PRId64 "e", decoded);
+    printf("%s\n", encoded_str);
     return encoded_str;
 }
 
 // Function to encode a list
 char *bencode_list(DecodedValue list) {
     if (list.val.list == NULL || list.size == 0) return NULL;
-    
+    printf("encoding list: ");
+
     char *value = (char *)malloc(2);
     size_t value_size = 2;
     
@@ -52,13 +57,16 @@ char *bencode_list(DecodedValue list) {
     }
     
     sprintf(value, "l%se", value);
+    printf("%s", value);
     return value;
 }
 
 // Function to encode a dictionary
 char *bencode_dict(DecodedValue dict) {
     if (dict.val.dict == NULL || dict.size == 0) return NULL;
-    
+    printf("encoding dict");
+
+
     char *value = (char *)malloc(2);
     size_t value_size = 2;
     
@@ -81,11 +89,13 @@ char *bencode_dict(DecodedValue dict) {
     }
     
     sprintf(value, "d%se", value);
+    printf("%s\n", value);
     return value;
 }
 
 // Function to encode a decoded value
 char *encode_decode(DecodedValue decoded) {
+    printf("trying ecodeing: \n");
     switch (decoded.type) {
         case DECODED_VALUE_TYPE_STR:
             return bencode_string(decoded.val.str);
@@ -99,4 +109,5 @@ char *encode_decode(DecodedValue decoded) {
             fprintf(stderr, "Invalid type\n");
             return NULL;
     }
+    printf("encoding ended!\n");
 }
