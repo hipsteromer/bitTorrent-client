@@ -105,23 +105,21 @@ MetaInfo info_extract(const char *content) {
     char *bencoded_info = encode_decode(decoded_content.val.dict[info_index].val);
     unsigned char hash[SHA1_DIGEST_LENGTH];
     if (!sha1_hash((const unsigned char *)bencoded_info, strlen(bencoded_info), hash)) {
-        fprintf(stderr, "SHA-1 hash computation failed");
+        fprintf(stderr, "SHA-1 hash computation failed\n");
         exit(1);
     }
-    printf(bencoded_info);
     free(bencoded_info);
-    printf("%s", hash);
-    file_contents.info_hash = (char *)malloc(SHA1_DIGEST_LENGTH);
-    if(file_contents.info_hash == NULL) {
-        fprintf(stderr, "memory allocation failed");
+
+    // Allocate memory for the hash and copy it
+    file_contents.info_hash = malloc(SHA1_DIGEST_LENGTH);
+    if (file_contents.info_hash == NULL) {
+        fprintf(stderr, "Memory allocation for info hash failed\n");
         exit(1);
     }
-    strcpy(file_contents.info_hash, hash);
+    memcpy(file_contents.info_hash, hash, SHA1_DIGEST_LENGTH);
 
     return file_contents;
 }
-
-
 
 void free_info(MetaInfo info) {
     free(info.url);
@@ -130,13 +128,16 @@ void free_info(MetaInfo info) {
     free(info.info_hash);
 }
 
-
 void print_meta_info(MetaInfo info) {
     if (info.url != NULL) {
         printf("Tracker URL: %s\n", info.url);
     }
     printf("Length: %zu\n", info.length);
-    if(info.info_hash != NULL) {
-        printf("info hash: %s\n", info.info_hash);
+    if (info.info_hash != NULL) {
+        printf("Info hash: ");
+        for (int i = 0; i < SHA1_DIGEST_LENGTH; i++) {
+            printf("%02x", (unsigned char)info.info_hash[i]);
+        }
+        printf("\n");
     }
 }
