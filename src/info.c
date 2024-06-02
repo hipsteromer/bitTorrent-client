@@ -134,7 +134,7 @@ void print_meta_info(MetaInfo info) {
     }
     printf("Length: %zu\n", info.length);
     if (info.info_hash != NULL) {
-        printf("Info hash: ");
+        printf("Info Hash: ");
         for (int i = 0; i < SHA1_DIGEST_LENGTH; i++) {
             printf("%02x", (unsigned char)info.info_hash[i]);
         }

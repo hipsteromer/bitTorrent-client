@@ -2,6 +2,7 @@
 #define BENCODE_H
 
 #include "decode.h"
+#include "info.h"
 #include <inttypes.h>
 
 

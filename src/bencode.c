@@ -13,6 +13,38 @@ char *allocate_memory(size_t size) {
     return ptr;
 }
 
+// Function that sorts the right order for info dictionary
+void info_single_file_sort(DecodedValue *info_dictionary) {
+    const char *order[4] = {
+        "length",
+        "name",
+        "piece length",
+        "pieces"
+    };
+
+    // Allocate memory for new dictionary
+    KeyValPair *new_dict = (KeyValPair *)malloc(sizeof(KeyValPair) * 4);
+
+    if (new_dict == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(1);
+    }
+
+    // Copy dictionary entries according to order
+    for (int i = 0; i < 4; i++) {
+        int index = find_index(*info_dictionary, order[i]);
+        if (index != -1) {
+            new_dict[i] = info_dictionary->val.dict[index];
+        }
+    }
+
+    // Free old dictionary and assign new one
+    free(info_dictionary->val.dict);
+    info_dictionary->val.dict = new_dict;
+}
+
+
+
 char *bencode_string(const char *decoded) {
     if (decoded == NULL) return NULL;
     
@@ -70,9 +102,11 @@ char *bencode_list(DecodedValue list) {
     return value;
 }
 
-char *bencode_dict(DecodedValue dict) {
-    if (dict.val.dict == NULL || dict.size == 0) return NULL;
+char *bencode_dict(DecodedValue *dict) {
+    if (dict->val.dict == NULL || dict->size == 0) return NULL;
     
+    info_single_file_sort(dict);
+
     size_t value_size = 2; // initial size for 'd' and 'e'
     char *value = allocate_memory(value_size);
     
@@ -80,9 +114,9 @@ char *bencode_dict(DecodedValue dict) {
 
     strcpy(value, "d");
 
-    for (size_t i = 0; i < dict.size; i++) {
-        char *temp1 = bencode_string(dict.val.dict[i].key);
-        char *temp2 = encode_decode(dict.val.dict[i].val);
+    for (size_t i = 0; i < dict->size; i++) {
+        char *temp1 = bencode_string(dict->val.dict[i].key);
+        char *temp2 = encode_decode(dict->val.dict[i].val);
         
         if (temp1 == NULL || temp2 == NULL) {
             free(value);
@@ -111,6 +145,7 @@ char *bencode_dict(DecodedValue dict) {
     return value;
 }
 
+
 char *encode_decode(DecodedValue decoded) {
     switch (decoded.type) {
         case DECODED_VALUE_TYPE_STR:
@@ -120,7 +155,7 @@ char *encode_decode(DecodedValue decoded) {
         case DECODED_VALUE_TYPE_LIST:
             return bencode_list(decoded);
         case DECODED_VALUE_TYPE_DICT:
-            return bencode_dict(decoded);
+            return bencode_dict(&decoded);
         default:
             fprintf(stderr, "Invalid type\n");
             return NULL;
