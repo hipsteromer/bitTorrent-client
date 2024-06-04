@@ -13,36 +13,17 @@ char *allocate_memory(size_t size) {
     return ptr;
 }
 
-// Function that sorts the right order for info dictionary
-void info_single_file_sort(DecodedValue *info_dictionary) {
-    const char *order[4] = {
-        "length",
-        "name",
-        "piece length",
-        "pieces"
-    };
-
-    // Allocate memory for new dictionary
-    KeyValPair *new_dict = (KeyValPair *)malloc(sizeof(KeyValPair) * 4);
-
-    if (new_dict == NULL) {
-        fprintf(stderr, "Memory allocation failed\n");
-        exit(1);
-    }
-
-    // Copy dictionary entries according to order
-    for (int i = 0; i < 4; i++) {
-        int index = find_index(*info_dictionary, order[i]);
-        if (index != -1) {
-            new_dict[i] = info_dictionary->val.dict[index];
-        }
-    }
-
-    // Free old dictionary and assign new one
-    free(info_dictionary->val.dict);
-    info_dictionary->val.dict = new_dict;
+// Comparison function to be used with qsort
+int compare_keyval_pairs(const void *a, const void *b) {
+    KeyValPair *pairA = (KeyValPair *)a;
+    KeyValPair *pairB = (KeyValPair *)b;
+    return strcmp(pairA->key, pairB->key);
 }
 
+// Function to sort a dictionary by its keys
+void sort_dict(KeyValPair *dict, size_t size) {
+    qsort(dict, size, sizeof(KeyValPair), compare_keyval_pairs);
+}
 
 
 char *bencode_string(const char *decoded) {
@@ -105,7 +86,8 @@ char *bencode_list(DecodedValue list) {
 char *bencode_dict(DecodedValue *dict) {
     if (dict->val.dict == NULL || dict->size == 0) return NULL;
     
-    info_single_file_sort(dict);
+    // Sorting the dictionary before encoding it
+    sort_dict(dict->val.dict, dict->size);
 
     size_t value_size = 2; // initial size for 'd' and 'e'
     char *value = allocate_memory(value_size);
@@ -144,7 +126,6 @@ char *bencode_dict(DecodedValue *dict) {
     strcat(value, "e");
     return value;
 }
-
 
 char *encode_decode(DecodedValue decoded) {
     switch (decoded.type) {
