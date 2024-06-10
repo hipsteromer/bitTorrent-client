@@ -19,7 +19,10 @@ typedef enum DecodedValueType {
 typedef struct DecodedValue {
     DecodedValueType type;
     union {
-        char *str;
+        struct {
+            char *str;
+            size_t length;
+        };
         int64_t integer;
         struct {
             struct DecodedValue *list;
@@ -28,7 +31,7 @@ typedef struct DecodedValue {
             struct KeyValPair *dict;
         };
     } val;
-    size_t size;  // Number of elements in the list or dict
+    size_t size;  // Number of elements in the list, dict or strings
 } DecodedValue;
 
 // Structure to implement a type of key and value pair (for the dictionary)
@@ -52,4 +55,4 @@ void free_decoded_value(DecodedValue decoded);
 // Print the decoded value
 void print_decoded_value(DecodedValue decoded);
 
-#endif // DECODE_H 
+#endif // DECODE_H

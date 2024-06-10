@@ -1,8 +1,4 @@
 #include "decode.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
 
 // Check if a character is a digit
 bool is_digit(char c) {
@@ -46,13 +42,13 @@ DecodedValue decode_string(const char *bencoded_value) {
         const char *colon_index = strchr(bencoded_value, ':');
         if (colon_index != NULL) {
             const char *start = colon_index + 1;
-            decoded.val.str = (char *)malloc(length + 1);
+            decoded.val.str = (char *)malloc(length);
             if (decoded.val.str == NULL) {
                 fprintf(stderr, "Memory allocation failed\n");
                 exit(1);
             }
-            strncpy(decoded.val.str, start, length);
-            decoded.val.str[length] = '\0';
+            memcpy(decoded.val.str, start, length); // Use memcpy for binary data
+            decoded.val.length = length;
         } else {
             fprintf(stderr, "Invalid encoded value: %s\n", bencoded_value);
             exit(1);
@@ -133,7 +129,6 @@ DecodedValue decode_dict(const char *bencoded_value) {
                 fprintf(stderr, "Dictionary key is not a string: %s\n", bencoded_value);
                 exit(1);
             }
-            size_t key_length = strlen(key_obj.val.str); // Only the key length
             index += find_value_length(&bencoded_value[index]);
 
             // Decode the value
@@ -147,7 +142,7 @@ DecodedValue decode_dict(const char *bencoded_value) {
                 fprintf(stderr, "Memory reallocation failed\n");
                 exit(1);
             }
-            decoded.val.dict[decoded.size].key = strdup(key_obj.val.str);
+            decoded.val.dict[decoded.size].key = strndup(key_obj.val.str, key_obj.val.length);
             if (decoded.val.dict[decoded.size].key == NULL) {
                 fprintf(stderr, "Memory allocation failed\n");
                 exit(1);
@@ -196,11 +191,15 @@ void free_decoded_value(DecodedValue decoded) {
     }
 }
 
-// Print the decoded value
+// Print the decoded value in a safe manner
 void print_decoded_value(DecodedValue decoded) {
     switch (decoded.type) {
         case DECODED_VALUE_TYPE_STR:
-            printf("\"%s\"", decoded.val.str);
+            printf("\"");
+            for (size_t i = 0; i < decoded.val.length; i++) {
+                printf("%c", decoded.val.str[i]);
+            }
+            printf("\"");
             break;
         case DECODED_VALUE_TYPE_INT:
             printf("%lld", decoded.val.integer);

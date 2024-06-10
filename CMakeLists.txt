@@ -13,7 +13,7 @@ find_package(OpenSSL REQUIRED)
 
 # Define the source directory and source files
 set(SRCDIR src)
-file(GLOB SOURCES "${SRCDIR}/*.c" "${SRCDIR}/sha1/*.c")
+file(GLOB SOURCES "${SRCDIR}/*.c" "${SRCDIR}/*.c")
 
 # Add the executable target
 add_executable(bittorrent-client ${SOURCES})

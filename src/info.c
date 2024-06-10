@@ -1,6 +1,6 @@
 #include "info.h"
 #include "bencode.h"
-#include "sha1/sha1.h"
+#include "sha1.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -102,29 +102,31 @@ MetaInfo info_extract(const char *content) {
     }
 
     // Assign info hash
-    char *bencoded_info = encode_decode(decoded_content.val.dict[info_index].val);
+    EncodedString bencoded_info = encode_decode(decoded_content.val.dict[info_index].val);
     unsigned char hash[SHA1_DIGEST_LENGTH];
-    if (!sha1_hash((const unsigned char *)bencoded_info, strlen(bencoded_info), hash)) {
+    if (!sha1_hash((const unsigned char *)bencoded_info.str, bencoded_info.length, hash)) {
         fprintf(stderr, "SHA-1 hash computation failed\n");
+        free(bencoded_info.str);
         exit(1);
     }
-    free(bencoded_info);
 
     // Allocate memory for the hash and copy it
     file_contents.info_hash = malloc(SHA1_DIGEST_LENGTH);
     if (file_contents.info_hash == NULL) {
         fprintf(stderr, "Memory allocation for info hash failed\n");
+        free(bencoded_info.str);
         exit(1);
     }
     memcpy(file_contents.info_hash, hash, SHA1_DIGEST_LENGTH);
+
+    // Free the encoded string
+    free(bencoded_info.str);
 
     return file_contents;
 }
 
 void free_info(MetaInfo info) {
     free(info.url);
-    free(info.name);
-    free(info.pieces);
     free(info.info_hash);
 }
 
