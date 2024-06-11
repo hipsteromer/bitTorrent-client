@@ -75,7 +75,7 @@ MetaInfo info_extract(const char *content) {
     }
 
     DecodedValue info_dict = decoded_content.val.dict[info_index].val;
-
+    int pieces_index = find_index(info_dict, "pieces");
     int length_index = find_index(info_dict, "length");
 
     // Assign URL
@@ -101,6 +101,15 @@ MetaInfo info_extract(const char *content) {
         exit(1);
     }
 
+    // Assign piece length
+    int piece_length_index = find_index(info_dict, "piece length");
+    if (piece_length_index != -1 && info_dict.val.dict[piece_length_index].val.type == DECODED_VALUE_TYPE_INT) {
+        file_contents.piece_length = info_dict.val.dict[piece_length_index].val.val.integer;
+    } else {
+        fprintf(stderr, "Piece length value not found or not an integer\n");
+        exit(1);
+    }
+
     // Assign info hash
     EncodedString bencoded_info = encode_decode(decoded_content.val.dict[info_index].val);
     unsigned char hash[SHA1_DIGEST_LENGTH];
@@ -119,6 +128,38 @@ MetaInfo info_extract(const char *content) {
     }
     memcpy(file_contents.info_hash, hash, SHA1_DIGEST_LENGTH);
 
+    // Assign pieces hashes
+    if (pieces_index != -1 && info_dict.val.dict[pieces_index].val.type == DECODED_VALUE_TYPE_STR) {
+        const char *pieces_value = info_dict.val.dict[pieces_index].val.val.str;
+        size_t pieces_length = info_dict.val.dict[pieces_index].val.val.length;
+
+        file_contents.num_pieces = pieces_length / SHA1_DIGEST_LENGTH;
+        file_contents.pieces_hashes = malloc(file_contents.num_pieces * sizeof(unsigned char *));
+        if (file_contents.pieces_hashes == NULL) {
+            fprintf(stderr, "Memory allocation for pieces hashes array failed\n");
+            free(bencoded_info.str);
+            exit(1);
+        }
+
+        for (size_t i = 0; i < file_contents.num_pieces; i++) {
+            file_contents.pieces_hashes[i] = malloc(SHA1_DIGEST_LENGTH);
+            if (file_contents.pieces_hashes[i] == NULL) {
+                fprintf(stderr, "Memory allocation for piece hash failed\n");
+                for (size_t j = 0; j < i; j++) {
+                    free(file_contents.pieces_hashes[j]);
+                }
+                free(file_contents.pieces_hashes);
+                free(bencoded_info.str);
+                exit(1);
+            }
+            memcpy(file_contents.pieces_hashes[i], pieces_value + i * 20, 20);
+        }
+    } else {
+        fprintf(stderr, "Pieces value not found or not a string\n");
+        free(bencoded_info.str);
+        exit(1);
+    }
+
     // Free the encoded string
     free(bencoded_info.str);
 
@@ -127,6 +168,12 @@ MetaInfo info_extract(const char *content) {
 
 void free_info(MetaInfo info) {
     free(info.url);
+    free(info.name);
+    free(info.pieces);
+    for (size_t i = 0; i < info.num_pieces; i++) {
+        free(info.pieces_hashes[i]);
+    }
+    free(info.pieces_hashes);
     free(info.info_hash);
 }
 
@@ -139,6 +186,14 @@ void print_meta_info(MetaInfo info) {
         printf("Info Hash: ");
         for (int i = 0; i < SHA1_DIGEST_LENGTH; i++) {
             printf("%02x", (unsigned char)info.info_hash[i]);
+        }
+        printf("\n");
+    }
+    printf("Piece Length: %zu\n", info.piece_length);
+    printf("Piece Hashes:\n");
+    for (size_t i = 0; i < info.num_pieces; i++) {
+        for (int j = 0; j < SHA1_DIGEST_LENGTH; j++) {
+            printf("%02x", (unsigned char)info.pieces_hashes[i][j]);
         }
         printf("\n");
     }
