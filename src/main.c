@@ -1,5 +1,6 @@
 #include "info.h"
 #include "decode.h"
+#include "tracker.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,6 +28,19 @@ int main(int argc, char *argv[]) {
         }
         MetaInfo info = info_extract(content);
         print_meta_info(info);
+        free_info(info);
+        free(content);
+    } else if (strcmp(command, "peers") == 0) {
+        const char *file_name = argv[2];
+        char *content = read_torrent_file(file_name);
+        if (content == NULL) {
+            fprintf(stderr, "Failed to read torrent file: %s\n", file_name);
+            return 1;
+        }
+        MetaInfo info = info_extract(content);
+        PeersList peers = get_peers(info);
+        print_peers(peers);
+        free_peers(peers);
         free_info(info);
         free(content);
     } else {

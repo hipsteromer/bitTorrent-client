@@ -15,6 +15,8 @@ typedef struct MetaInfo {
     size_t num_pieces;             // Number of pieces
 } MetaInfo;
 
+
+int find_index(DecodedValue object, const char *str);
 char *read_torrent_file(const char *file_name);
 MetaInfo info_extract(const char *content);
 void free_info(MetaInfo info);
