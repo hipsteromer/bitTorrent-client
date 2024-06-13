@@ -86,7 +86,7 @@ size_t write_chunk(void *data, size_t size, size_t nmemb, void *userdata) {
     char *ptr = realloc(response->string, response->size + real_size + 1);
     if(ptr == NULL) {
         fprintf(stderr, "Memory allocation failed");
-        return CURL_WRITEFUNC_ERROR;
+        return CURLE_WRITE_ERROR;
     }
 
     response->string = ptr;
