@@ -11,10 +11,17 @@
 #define PEER_ID "00112233445566778899"
 #define PACKET_LENGTH 68
 
+#define UNCHOKE 1     // no payload
+#define INTRESTED 2   // no payload
+#define BITFIELD 5    
+#define REQUEST 6     
+#define PIECE 7       
+
 void construct_handshake_packet(char *handshake_packet, const char *info_hash);
 int create_socket();
 int connect_to_peer(int sockfd, const char *peer_ip, int peer_port);
 int send_handshake(int sockfd, const char *handshake_packet);
 int receive_response(int sockfd, char *response, size_t response_size);
+char *perform_peer_handshake(int sockfd, char *torrent_file, char *peer_ip, int peer_port);
 
 #endif // PEER_H

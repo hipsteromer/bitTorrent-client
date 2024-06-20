@@ -1,4 +1,5 @@
 #include "peer.h"
+#include "info.h"
 
 #include <arpa/inet.h>
 
@@ -54,5 +55,55 @@ int receive_response(int sockfd, char *response, size_t response_size) {
         return -1;
     }
     return num_bytes;
+}
+
+char *perform_peer_handshake(int sockfd, char *torrent_file, char *peer_ip, int peer_port) {
+    char *content = read_torrent_file(torrent_file);
+    if (content == NULL) {
+        fprintf(stderr, "Failed to read torrent file: %s\n", torrent_file);
+        return NULL;  // Return NULL to indicate failure
+    }
+
+    MetaInfo info = info_extract(content);
+    free(content);
+
+    char info_hash[20];
+    memcpy(info_hash, info.info_hash, 20);
+
+    char handshake_packet[PACKET_LENGTH];
+    construct_handshake_packet(handshake_packet, info_hash);
+
+    if (connect_to_peer(sockfd, peer_ip, peer_port) < 0) {
+        fprintf(stderr, "Failed to connect to peer: %s:%d\n", peer_ip, peer_port);
+        free_info(info);
+        return NULL;
+    }
+
+    if (send_handshake(sockfd, handshake_packet) < 0) {
+        fprintf(stderr, "Failed to send handshake to peer: %s:%d\n", peer_ip, peer_port);
+        close(sockfd);
+        free_info(info);
+        return NULL;
+    }
+
+    char *response = malloc(PACKET_LENGTH);
+    if (response == NULL) {
+        fprintf(stderr, "Memory allocation failed for response\n");
+        close(sockfd);
+        free_info(info);
+        return NULL;
+    }
+
+    int num_bytes = receive_response(sockfd, response, PACKET_LENGTH);
+    if (num_bytes < 0) {
+        fprintf(stderr, "Failed to receive response from peer: %s:%d\n", peer_ip, peer_port);
+        close(sockfd);
+        free(response);
+        free_info(info);
+        return NULL;
+    }
+
+    free_info(info);
+    return response;
 }
 

@@ -52,59 +52,39 @@ int main(int argc, char *argv[]) {
         free_info(info);
         free(content);
     } else if (strcmp(command, "handshake") == 0) {
-        if (argc != 4) {
-            fprintf(stderr, "Usage: bittorrent handshake <torrent file> <peer_ip>:<peer_port>\n");
-            return 1;
-        }
+    if (argc != 4) {
+        fprintf(stderr, "Usage: bittorrent handshake <torrent file> <peer_ip>:<peer_port>\n");
+        return 1;
+    }
 
-        const char *torrent_file = argv[2];
-        const char *peer_info = argv[3];
-        char peer_ip[256];
-        int peer_port;
+    const char *torrent_file = argv[2];
+    const char *peer_info = argv[3];
+    char peer_ip[256];
+    int peer_port;
 
-        if (sscanf(peer_info, "%255[^:]:%d", peer_ip, &peer_port) != 2) {
-            fprintf(stderr, "Invalid peer address format. Expected <peer_ip>:<peer_port>\n");
-            return 1;
-        }
+    if (sscanf(peer_info, "%255[^:]:%d", peer_ip, &peer_port) != 2) {
+        fprintf(stderr, "Invalid peer address format. Expected <peer_ip>:<peer_port>\n");
+        return 1;
+    }
 
-        // Read the torrent file and extract the info hash
-        char *content = read_torrent_file(torrent_file);
-        if (content == NULL) {
-            fprintf(stderr, "Failed to read torrent file: %s\n", torrent_file);
-            return 1;
-        }
-        MetaInfo info = info_extract(content);
-        free(content);
+    int sockfd = create_socket();
+    if (sockfd < 0) return 1;
 
-        // Use info_hash from MetaInfo
-        char info_hash[20];
-        memcpy(info_hash, info.info_hash, 20);
+    char *response = perform_peer_handshake(sockfd, torrent_file, peer_ip, peer_port);
 
-        char handshake_packet[PACKET_LENGTH];
-        construct_handshake_packet(handshake_packet, info_hash);
-
-        int sockfd = create_socket();
-        if (sockfd < 0) return 1;
-
-        if (connect_to_peer(sockfd, peer_ip, peer_port) < 0) return 1;
-
-        if (send_handshake(sockfd, handshake_packet) < 0) {
-            close(sockfd);
-            return 1;
-        }
-
-        char response[PACKET_LENGTH];
-        int num_bytes = receive_response(sockfd, response, PACKET_LENGTH);
-        if (num_bytes < 0) {
-            close(sockfd);
-            return 1;
-        }
-
-        printf("Peer ID: ");
-        print_hex((unsigned char *)&response[48], 20);
-
+    if (response == NULL) {
+        fprintf(stderr, "Failed to perform handshake with peer %s:%d\n", peer_ip, peer_port);
         close(sockfd);
-        free_info(info);
+        return 1;
+    }
+
+
+    printf("Peer ID: ");
+    print_hex((unsigned char *)&response[48], 20);
+
+    free(response);  // Free dynamically allocated memory
+    close(sockfd);
+
     } else {
         fprintf(stderr, "Unknown command: %s\n", command);
         return 1;
@@ -112,3 +92,4 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
