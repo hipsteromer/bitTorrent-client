@@ -164,6 +164,77 @@ int main(int argc, char *argv[]) {
     free(response);
     free(content);
     close(sockfd);
+    } else if (strcmp(command, "download_file") == 0 && argc == 5) {
+    const char *target_file = argv[3];
+    const char *torrent_file = argv[4];
+
+    // Get peers' IP
+    char *content = read_torrent_file(torrent_file);
+    if (content == NULL) {
+        fprintf(stderr, "Failed to read torrent file: %s\n", torrent_file);
+        return 1;
+    }
+    MetaInfo info = info_extract(content);
+    PeersList peers_list = get_peers(info);
+
+    // Open the target file for writing
+    FILE *file = fopen(target_file, "wb");
+    if (file == NULL) {
+        perror("Failed to open target file for writing");
+        free_peers(peers_list);
+        free_info(info);
+        free(content);
+        return 1;
+    }
+
+    for (uint32_t piece_index = 0; piece_index < info.num_pieces; piece_index++) {
+        // Length of the piece to download
+        uint32_t piece_length = (piece_index == info.num_pieces - 1) ? 
+                                info.length - (piece_index * info.piece_length) : 
+                                info.piece_length;
+
+        char *piece_data = NULL;
+        int sockfd = -1;
+        for (int peer_index = 0; peer_index < peers_list.count; peer_index++) {
+            sockfd = create_socket();
+            if (sockfd < 0) continue;
+
+            char *response = perform_peer_handshake(sockfd, info.info_hash, peers_list.peers[peer_index].ip, peers_list.peers[peer_index].port);
+            if (response == NULL) {
+                close(sockfd);
+                continue;
+            }
+
+            piece_data = download_piece(sockfd, piece_index, piece_length);
+            free(response);
+            close(sockfd);
+
+            if (piece_data != NULL && verify_piece(piece_data, piece_length, info.pieces_hashes[piece_index])) {
+                break;
+            }
+
+            free(piece_data);
+            piece_data = NULL;
+        }
+
+        if (piece_data == NULL) {
+            fprintf(stderr, "Failed to download piece %u\n", piece_index);
+            fclose(file);
+            free_peers(peers_list);
+            free_info(info);
+            free(content);
+            return 1;
+        }
+
+        fwrite(piece_data, 1, piece_length, file);
+        free(piece_data);
+    }
+
+    // Cleanup
+    fclose(file);
+    free_peers(peers_list);
+    free_info(info);
+    free(content);
     } else {
         fprintf(stderr, "Unknown command: %s\n", command);
         return 1;
