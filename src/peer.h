@@ -10,18 +10,20 @@
 #define PROTOCOL_STRING "BitTorrent protocol"
 #define PEER_ID "00112233445566778899"
 #define PACKET_LENGTH 68
+#define BLOCK_LENGTH 16384
 
-#define UNCHOKE 1     // no payload
-#define INTRESTED 2   // no payload
+#define LENGTH_PREFIX_SIZE 4 
+#define UNCHOKE 1            // no payload
+#define INTERESTED 2          // no payload
 #define BITFIELD 5    
 #define REQUEST 6     
 #define PIECE 7       
 
-void construct_handshake_packet(char *handshake_packet, const char *info_hash);
 int create_socket();
-int connect_to_peer(int sockfd, const char *peer_ip, int peer_port);
-int send_handshake(int sockfd, const char *handshake_packet);
-int receive_response(int sockfd, char *response, size_t response_size);
-char *perform_peer_handshake(int sockfd, char *torrent_file, char *peer_ip, int peer_port);
+char *perform_peer_handshake(int sockfd, const unsigned char *info_hash, const char *peer_ip, int peer_port);
+int read_packet(int sockfd, char **packet);
+char *download_piece(int sockfd, uint32_t piece_index, uint32_t piece_length);
+int verify_piece(const char *piece_recived, size_t piece_length, const unsigned char *piece_hash);
+
 
 #endif // PEER_H

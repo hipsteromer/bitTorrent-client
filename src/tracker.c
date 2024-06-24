@@ -51,7 +51,6 @@ PeersList get_peers(MetaInfo info)
         fprintf(stderr, "peers key not found");
         exit(1);
     }
-
     size_t raw_addresses_string_length = decodedResponse.val.dict[peers_index].val.val.length;
     char *raw_addresses_string = malloc(raw_addresses_string_length);
     memcpy(raw_addresses_string, decodedResponse.val.dict[peers_index].val.val.str, raw_addresses_string_length);
