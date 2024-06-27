@@ -20,9 +20,14 @@
 #define PIECE 7       
 
 int create_socket();
+
+// sends handshake packet to peer, get back a response (same format)
 char *perform_peer_handshake(int sockfd, const unsigned char *info_hash, const char *peer_ip, int peer_port);
-int read_packet(int sockfd, char **packet);
+
+// handle peer messanging - recv bitfield, send intrested, recv unchoke, loop(send request, recv piece). return the contents of the piece (bytes)
 char *download_piece(int sockfd, uint32_t piece_index, uint32_t piece_length);
+
+// compares the hash of the piece we have gotten to the hash piece from the metainfo
 int verify_piece(const char *piece_recived, size_t piece_length, const unsigned char *piece_hash);
 
 

@@ -25,11 +25,19 @@ typedef struct {
     size_t size;
 } Response;
 
-char *url_encode(const unsigned char *data, size_t length);
-char *construct_tracker_url(const char *base_url, const char *info_hash, const char *peer_id, const char *port, size_t length);
+// return a list of peers addresses
 PeersList get_peers(MetaInfo info);
+
+// writes incoming data to a string
 size_t write_chunk(void *data, size_t size, size_t nmemb, void *userdata);
+
+// print peers addresses list (useless with ncurses)
 void print_peers(PeersList peers);
+
+// free the memory allocated for the peers addresses list
 void free_peers(PeersList peers);
+
+// constucts a string of the peer addresses list (useful for ncurses)
+char* peers_list_to_string(PeersList peers);
 
 #endif // TRACKER_H

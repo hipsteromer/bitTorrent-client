@@ -198,3 +198,54 @@ void print_meta_info(MetaInfo info) {
         printf("\n");
     }
 }
+
+// Convert meta info to string
+char* meta_info_to_string(MetaInfo info) {
+    char *result = NULL;
+    size_t result_size = 0;
+    char buffer[1024];
+
+    if (info.url != NULL) {
+        result_size = snprintf(NULL, 0, "Tracker URL: %s\n", info.url) + 1;
+        result = (char*)malloc(result_size);
+        snprintf(result, result_size, "Tracker URL: %s\n", info.url);
+    } else {
+        result = (char*)malloc(1);
+        result[0] = '\0';
+    }
+
+    result_size += snprintf(buffer, sizeof(buffer), "Length: %zu\n", info.length);
+    result = (char*)realloc(result, result_size + 1);
+    strcat(result, buffer);
+
+    if (info.info_hash != NULL) {
+        strcat(result, "Info Hash: ");
+        result_size += 11; // Length of "Info Hash: "
+
+        for (int i = 0; i < SHA1_DIGEST_LENGTH; i++) {
+            snprintf(buffer, sizeof(buffer), "%02x", (unsigned char)info.info_hash[i]);
+            result_size += 2;
+            result = (char*)realloc(result, result_size + 1);
+            strcat(result, buffer);
+        }
+        strcat(result, "\n");
+        result_size++;
+    }
+
+    result_size += snprintf(buffer, sizeof(buffer), "Piece Length: %zu\nPiece Hashes:\n", info.piece_length);
+    result = (char*)realloc(result, result_size + 1);
+    strcat(result, buffer);
+
+    for (size_t i = 0; i < info.num_pieces; i++) {
+        for (int j = 0; j < SHA1_DIGEST_LENGTH; j++) {
+            snprintf(buffer, sizeof(buffer), "%02x", (unsigned char)info.pieces_hashes[i][j]);
+            result_size += 2;
+            result = (char*)realloc(result, result_size + 1);
+            strcat(result, buffer);
+        }
+        strcat(result, "\n");
+        result_size++;
+    }
+
+    return result;
+}

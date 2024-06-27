@@ -102,6 +102,22 @@ void print_peers(PeersList peers) {
     }
 }
 
+char* peers_list_to_string(PeersList peers) {
+    char *result = NULL;
+    size_t result_size = 0;
+    char buffer[256];
+
+    for (size_t i = 0; i < peers.count; ++i) {
+        size_t peer_info_size = snprintf(buffer, sizeof(buffer), "%s:%d\n", peers.peers[i].ip, peers.peers[i].port);
+        result_size += peer_info_size;
+
+        result = (char*)realloc(result, result_size + 1);
+        strcat(result, buffer);
+    }
+
+    return result;
+}
+
 void free_peers(PeersList peers) {
     free(peers.peers);
 }

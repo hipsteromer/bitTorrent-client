@@ -230,3 +230,68 @@ void print_decoded_value(DecodedValue decoded) {
             break;
     }
 }
+
+char *decode_value_to_string(DecodedValue decoded) {
+    if (decoded.type == DECODED_VALUE_TYPE_STR) {
+        return strdup(decoded.val.str);
+    } else if (decoded.type == DECODED_VALUE_TYPE_INT) {
+        int length = snprintf(NULL, 0, "%d", decoded.val.integer);
+        char *str = (char *)malloc(length + 1);
+        snprintf(str, length + 1, "%d", decoded.val.integer);
+        return str;
+    } else if (decoded.type == DECODED_VALUE_TYPE_LIST) {
+        // Estimate required buffer size
+        size_t total_length = 2; // For '[' and ']'
+        for (size_t i = 0; i < decoded.size; ++i) {
+            char *element_str = decode_value_to_string(decoded.val.list[i]);
+            total_length += strlen(element_str) + 2; // For element and ", "
+            free(element_str);
+        }
+
+        char *str = (char *)malloc(total_length);
+        str[0] = '[';
+        str[1] = '\0';
+
+        for (size_t i = 0; i < decoded.size; ++i) {
+            char *element_str = decode_value_to_string(decoded.val.list[i]);
+            strcat(str, element_str);
+            if (i < decoded.size - 1) {
+                strcat(str, ", ");
+            }
+            free(element_str);
+        }
+
+        strcat(str, "]");
+        return str;
+    } else if (decoded.type == DECODED_VALUE_TYPE_DICT) {
+        // Estimate required buffer size
+        size_t total_length = 2; // For '{' and '}'
+        for (size_t i = 0; i < decoded.size; ++i) {
+            char *key_str = decoded.val.dict[i].key;
+            char *value_str = decode_value_to_string(decoded.val.dict[i].val);
+            total_length += strlen(key_str) + strlen(value_str) + 4; // For key, value, ": ", and ", "
+            free(value_str);
+        }
+
+        char *str = (char *)malloc(total_length);
+        str[0] = '{';
+        str[1] = '\0';
+
+        for (size_t i = 0; i < decoded.size; ++i) {
+            char *key_str = decoded.val.dict[i].key;
+            char *value_str = decode_value_to_string(decoded.val.dict[i].val);
+            strcat(str, key_str);
+            strcat(str, ": ");
+            strcat(str, value_str);
+            if (i < decoded.size - 1) {
+                strcat(str, ", ");
+            }
+            free(value_str);
+        }
+
+        strcat(str, "}");
+        return str;
+    } else {
+        return strdup("unknown");
+    }
+}

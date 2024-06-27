@@ -55,4 +55,6 @@ void free_decoded_value(DecodedValue decoded);
 // Print the decoded value
 void print_decoded_value(DecodedValue decoded);
 
+char *decode_value_to_string(DecodedValue decoded);
+
 #endif // DECODE_H
